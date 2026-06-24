@@ -228,13 +228,13 @@ footer .reset:hover{border-color:#FB7185;color:#FB7185}
 const ROADMAP = {
   "meta": {
     "title": "BACKEND JOURNEY",
-    "subtitle": "결제·정산 × LLM 시스템 — 토스/SK 티어 표적",
+    "subtitle": "결제·정산 × LLM 운영 신뢰성 · 9개월 백엔드 엔지니어링 로드맵",
     "owner": "Taewoo-Won",
     "journey_start": "2026-06-19",
     "discharge_date": "2027-03-21",
     "flagship": "밑바닥부터 만든 트랜잭션 원장 + AI 운영 레이어",
     "repo": "github.com/Taewoo-Won/mini-ledger",
-    "note": "이 파일이 단일 진실 공급원이다. 마일스톤 status(todo/in_progress/done)와 logs를 여기서 고치고, build.py를 돌리면 대시보드(index.html)에 반영된다. discharge_date는 본인 실제 전역일로 바꿔라."
+    "note": "roadmap.json이 단일 데이터 소스다. 마일스톤 status(todo/in_progress/done)와 logs를 수정하고 build.py를 실행하면 index.html에 반영된다."
   },
   "phases": [
     {
@@ -245,7 +245,7 @@ const ROADMAP = {
       "start": "2026-06",
       "end": "2026-07",
       "color": "#7DA2FF",
-      "thesis": "Java/Spring/JPA 기초 + Git + 첫 API. 저수준 감각도 맛본다.",
+      "thesis": "Java·Spring·JPA 기초와 Git, 첫 API. 저수준 시스템 감각을 함께 익힌다.",
       "milestones": [
         {
           "id": "m101",
@@ -268,20 +268,20 @@ const ROADMAP = {
         },
         {
           "id": "m104",
-          "title": "Git/GitHub 워크플로 (커밋·푸시·잔디)",
+          "title": "Git/GitHub 워크플로 (커밋·푸시)",
           "weight": 1,
           "status": "done",
           "done": "2026-06-19"
         },
         {
           "id": "m105",
-          "title": "첫 Spring Boot 이체 API (POST→잔액 변경 확인)",
+          "title": "첫 Spring Boot 이체 API (POST → 잔액 변경 확인)",
           "weight": 4,
           "status": "todo"
         },
         {
           "id": "m106",
-          "title": "CodeCrafters 'Build Your Own Redis' 1단계 맛보기",
+          "title": "CodeCrafters 'Build Your Own Redis' 1단계",
           "weight": 2,
           "status": "todo"
         },
@@ -296,12 +296,12 @@ const ROADMAP = {
     {
       "id": "p2",
       "name": "Layer 0 — From-scratch 코어",
-      "tag": "천장 · 리스크",
+      "tag": "Core Engine",
       "window": "8–11월",
       "start": "2026-08",
       "end": "2026-11",
       "color": "#F472B6",
-      "thesis": "JPA/Postgres 아래를 직접 만든다. ORM 아래를 안다는 증거 — T2의 심장.",
+      "thesis": "JPA·Postgres를 쓰기 전에 그 아래 계층을 직접 구현한다 — 트랜잭션·내구성을 만들어서 이해한다.",
       "milestones": [
         {
           "id": "m201",
@@ -335,7 +335,7 @@ const ROADMAP = {
         },
         {
           "id": "m206",
-          "title": "SQLD 자격증 (8월, 필터 통과용)",
+          "title": "SQLD 자격증 (8월)",
           "weight": 2,
           "status": "todo"
         }
@@ -349,7 +349,7 @@ const ROADMAP = {
       "start": "2026-09",
       "end": "2026-12",
       "color": "#34D399",
-      "thesis": "L0 위에 복식부기 결제·정산 원장. 네가 만든 토대 위라 격이 다르다.",
+      "thesis": "Layer 0 위에 복식부기 기반 결제·정산 원장을 구현한다.",
       "milestones": [
         {
           "id": "m301",
@@ -377,7 +377,7 @@ const ROADMAP = {
         },
         {
           "id": "m305",
-          "title": "동시성 안전 (L0 잠금/MVCC 적용)",
+          "title": "동시성 안전 (Layer 0 잠금/MVCC 적용)",
           "weight": 3,
           "status": "todo"
         }
@@ -386,12 +386,12 @@ const ROADMAP = {
     {
       "id": "p4",
       "name": "Layer 2 — AI 운영·신뢰성",
-      "tag": "최대 차별화",
+      "tag": "AI Reliability",
       "window": "12–1월",
       "start": "2026-12",
       "end": "2027-01",
       "color": "#A78BFA",
-      "thesis": "결제급 신뢰성을 AI에 융합. 래퍼가 아닌 시스템 규율 — 미래 그 자체.",
+      "thesis": "결제급 신뢰성(멱등성·ACID·HITL)을 LLM 에이전트에 적용한다.",
       "milestones": [
         {
           "id": "m401",
@@ -401,7 +401,7 @@ const ROADMAP = {
         },
         {
           "id": "m402",
-          "title": "멱등성 키 가드 (재시도 LLM 이중실행 방지)",
+          "title": "멱등성 키 가드 (재시도 이중실행 방지)",
           "weight": 3,
           "status": "todo"
         },
@@ -439,7 +439,7 @@ const ROADMAP = {
       "start": "2026-12",
       "end": "2027-01",
       "color": "#22D3EE",
-      "thesis": "기존 거래 모니터링이 전체의 관측 레이어가 된다.",
+      "thesis": "실시간 집계·이상 감지·메트릭으로 시스템 관측 레이어를 구성한다.",
       "milestones": [
         {
           "id": "m501",
@@ -449,7 +449,7 @@ const ROADMAP = {
         },
         {
           "id": "m502",
-          "title": "이상 감지 (AI 에이전트에 피드)",
+          "title": "이상 감지 (에이전트에 피드)",
           "weight": 3,
           "status": "todo"
         },
@@ -464,28 +464,28 @@ const ROADMAP = {
     {
       "id": "p6",
       "name": "규율 + OSS",
-      "tag": "학위 동등 무기",
+      "tag": "OSS · Docs",
       "window": "2월",
       "start": "2027-02",
       "end": "2027-02",
       "color": "#FBBF24",
-      "thesis": "포스트모템·ADR·다이어그램·영문 README + 메이저 OSS 기여 착수.",
+      "thesis": "포스트모템·ADR·다이어그램·문서화, 그리고 오픈소스 기여.",
       "milestones": [
         {
           "id": "m601",
-          "title": "메타 산출물 (eval·비용·포스트모템·ADR·다이어그램·영문 README)",
+          "title": "문서화 (eval·비용·포스트모템·ADR·다이어그램·영문 README)",
           "weight": 3,
           "status": "todo"
         },
         {
           "id": "m602",
-          "title": "메이저 OSS 1건 기여 (표적 회사 자사 repo 우선)",
+          "title": "오픈소스 기여 (관련 프로젝트 1건 이상)",
           "weight": 5,
           "status": "todo"
         },
         {
           "id": "m603",
-          "title": "코딩테스트 시작 (백준·프로그래머스)",
+          "title": "코딩테스트 (백준·프로그래머스)",
           "weight": 3,
           "status": "todo"
         }
@@ -493,35 +493,35 @@ const ROADMAP = {
     },
     {
       "id": "p7",
-      "name": "가시성 + 접촉 + 지원",
-      "tag": "사파 · 우회",
-      "window": "12–4월",
+      "name": "공개 + 지원",
+      "tag": "Public · Apply",
+      "window": "12–3월",
       "start": "2026-12",
-      "end": "2027-04",
+      "end": "2027-03",
       "color": "#FB923C",
-      "thesis": "글로 발견되게(서류 필터 우회) + 일찍 접촉(76%) + 전역 직후 지원.",
+      "thesis": "빌드 과정을 기술 글로 공개하고, 지원을 준비한다.",
       "milestones": [
         {
           "id": "m701",
-          "title": "from-scratch WAL 글 + AI 신뢰성 글 공개 (velog·긱뉴스·X)",
+          "title": "기술 글 공개 (WAL·AI 신뢰성 등 빌드 과정)",
           "weight": 3,
           "status": "todo"
         },
         {
           "id": "m702",
-          "title": "일찍 접촉 (6–7개월차 초안 피드백·반복)",
+          "title": "중간 단계 피드백 수집·반영",
           "weight": 2,
           "status": "todo"
         },
         {
           "id": "m703",
-          "title": "지원 (토스·카카오페이·네이버페이·카뱅 + 결제·정산 직결)",
+          "title": "결제·정산 분야 백엔드 포지션 지원",
           "weight": 2,
           "status": "todo"
         },
         {
           "id": "m704",
-          "title": "면접 (모든 답을 플래그십 레이어에서 길어오기)",
+          "title": "면접 준비 (프로젝트 기반 답변 정리)",
           "weight": 3,
           "status": "todo"
         }
@@ -538,7 +538,7 @@ const ROADMAP = {
         "git",
         "gh"
       ],
-      "summary": "8-K 봇 은퇴·아카이브, JDK21 설치, git/SSH 키, java-practice 첫 커밋·푸시·잔디."
+      "summary": "JDK21 설치, git/SSH 키 구성, java-practice 저장소 첫 커밋·푸시."
     },
     {
       "date": "2026-06-20",
@@ -547,7 +547,7 @@ const ROADMAP = {
         "클래스",
         "메서드"
       ],
-      "summary": "Account 클래스(돈은 long, 검증 먼저), deposit/withdraw, mini-ledger repo 생성·커밋 9e671d6."
+      "summary": "Account 클래스(잔액은 long, 검증을 변경보다 먼저), deposit/withdraw, mini-ledger 저장소 생성. 커밋 9e671d6."
     },
     {
       "date": "2026-06-21",
@@ -556,7 +556,7 @@ const ROADMAP = {
         "Map",
         "객체생성"
       ],
-      "summary": "Bank 필드+createAccount, 'Bank엔 왜 this.id 없나' 4단계 해부, 작업폴더 디버깅, 커밋 e02b204."
+      "summary": "Bank 필드 + createAccount 구현, 작업 디렉터리 디버깅. 커밋 e02b204."
     },
     {
       "date": "2026-06-22",
@@ -565,7 +565,7 @@ const ROADMAP = {
         "null",
         "반환타입"
       ],
-      "summary": "getAccount 구현, Map.get는 null 반환, 스마트 구두점(둥근 따옴표) 함정 영구 해결."
+      "summary": "getAccount 구현, Map.get의 null 반환 처리, 스마트 따옴표 컴파일 이슈 해결."
     },
     {
       "date": "2026-06-23",
@@ -574,7 +574,7 @@ const ROADMAP = {
         "안전한 순서",
         "위임"
       ],
-      "summary": "transfer를 답 안 받고 구현(출금→입금), Main 실행증명 1100/4500, 16개 오답 전면 해부. 커밋 9cc49e6."
+      "summary": "transfer 구현(출금 → 입금 순서로 일관성 보장), Main 실행 검증(1100/4500), 오답 정리. 커밋 9cc49e6."
     }
   ]
 };
@@ -632,7 +632,7 @@ function renderShell(){
 }
 function renderTop(mx){
   document.getElementById("dday").textContent = "D-"+mx.dDay;
-  document.getElementById("ddaySub").textContent = mx.discharge||("~"+ROADMAP.meta.discharge_date);
+  document.getElementById("ddaySub").textContent = ROADMAP.meta.discharge_date;
   const p=curPhase();
   document.getElementById("curDot").style.background=p.color;
   document.getElementById("curPhase").textContent=p.name;
