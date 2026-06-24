@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Backend Journey — 진행 현황</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0A0F1C; --ink2:#0E1525; --panel:#121C30; --panel2:#172238;
+  --line:#243049; --line2:#2E3C5A;
+  --text:#E8EEF9; --muted:#93A1BE; --faint:#5E6E8E;
+  --done:#34D399; --active:#FBBF24; --todo:#44557A;
+  --disp:'Space Grotesk','Apple SD Gothic Neo','Pretendard',system-ui,sans-serif;
+  --body:'Inter','Apple SD Gothic Neo','Pretendard',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono','SF Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--body); background:var(--ink); color:var(--text);
+  line-height:1.55; padding:0 16px calc(40px + env(safe-area-inset-bottom));
+  max-width:1080px; margin:0 auto; -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(1200px 600px at 80% -10%, rgba(125,162,255,.07), transparent 60%),
+                   radial-gradient(900px 500px at -10% 10%, rgba(52,211,153,.05), transparent 55%);
+}
+a{color:inherit;text-decoration:none}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--faint);font-weight:500}
+
+/* ── top bar ── */
+header{display:flex;justify-content:space-between;align-items:flex-start;
+  padding:22px 2px 14px;border-bottom:1px solid var(--line)}
+header .brand .name{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.18em;color:var(--text)}
+header .brand .name b{color:var(--done)}
+header .brand .flag{font-size:12px;color:var(--muted);margin-top:3px;max-width:46ch}
+header .dday{text-align:right;flex-shrink:0;padding-left:12px}
+header .dday .lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--faint);text-transform:uppercase}
+header .dday .val{font-family:var(--mono);font-weight:700;font-size:22px;color:var(--active);line-height:1.1;margin-top:2px}
+header .dday .sub{font-family:var(--mono);font-size:10px;color:var(--faint)}
+
+/* ── hero ── */
+.hero{display:flex;gap:26px;align-items:center;padding:26px 4px 10px;flex-wrap:wrap}
+.gauge{position:relative;width:156px;height:156px;flex-shrink:0}
+.gauge svg{transform:rotate(-90deg)}
+.gauge .pct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gauge .pct b{font-family:var(--mono);font-weight:700;font-size:38px;letter-spacing:-.02em;line-height:1}
+.gauge .pct b span{font-size:18px;color:var(--muted)}
+.gauge .pct small{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-top:5px}
+.hero .lede{flex:1;min-width:240px}
+.hero .lede h1{font-family:var(--disp);font-weight:700;font-size:25px;line-height:1.16;letter-spacing:-.01em}
+.hero .lede .where{display:flex;align-items:center;gap:8px;margin-top:11px}
+.hero .lede .where .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.hero .lede .where .ph{font-size:13.5px;font-weight:600}
+.hero .lede .where .win{font-family:var(--mono);font-size:11px;color:var(--faint)}
+.hero .lede .day{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:7px}
+.hero .lede .day b{color:var(--text)}
+
+/* ── stat strip ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0 6px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 13px}
+.stat .n{font-family:var(--mono);font-weight:700;font-size:21px;line-height:1}
+.stat .n s{font-size:13px;color:var(--faint);text-decoration:none}
+.stat .l{font-size:11px;color:var(--muted);margin-top:5px;letter-spacing:.01em}
+
+/* ── section heads ── */
+.sec{margin-top:34px}
+.sec-h{display:flex;align-items:baseline;gap:11px;margin-bottom:13px}
+.sec-h .idx{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.1em}
+.sec-h h2{font-family:var(--disp);font-weight:600;font-size:16px;letter-spacing:.01em}
+.sec-h .hint{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+
+/* ── ledger timeline ── */
+.tl-wrap{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.tl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tl{min-width:660px;padding:14px 16px 16px;position:relative}
+.tl-months{display:grid;grid-template-columns:128px repeat(11,1fr);align-items:end;margin-bottom:8px}
+.tl-months .sp{}
+.tl-months .m{font-family:var(--mono);font-size:10px;color:var(--faint);text-align:center;border-left:1px solid var(--line);padding:2px 0 4px}
+.tl-months .m.yr{color:var(--muted)}
+.tl-row{display:grid;grid-template-columns:128px 1fr;align-items:center;height:30px}
+.tl-row .lab{display:flex;align-items:center;gap:7px;padding-right:10px;overflow:hidden}
+.tl-row .lab .d{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.tl-row .lab .t{font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-track{position:relative;height:30px}
+.tl-grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(11,1fr);pointer-events:none}
+.tl-grid span{border-left:1px solid rgba(255,255,255,.04)}
+.tl-bar{position:absolute;top:7px;height:16px;border-radius:5px;overflow:hidden;background:rgba(255,255,255,.06)}
+.tl-bar .fill{position:absolute;inset:0;border-radius:5px;opacity:.92}
+.tl-bar .pc{position:absolute;right:6px;top:0;bottom:0;display:flex;align-items:center;font-family:var(--mono);font-size:9px;font-weight:700;color:rgba(10,15,28,.8)}
+.tl-today{position:absolute;top:30px;bottom:6px;width:2px;background:var(--active);z-index:5}
+.tl-today::before{content:'TODAY';position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.1em;color:var(--active);white-space:nowrap}
+.tl-today::after{content:'';position:absolute;top:0;left:-3px;width:8px;height:8px;border-radius:50%;background:var(--active)}
+
+/* ── phases ── */
+.phase{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-bottom:11px;overflow:hidden}
+.phase summary{list-style:none;cursor:pointer;display:block;padding:15px 16px;outline:none}
+.phase summary::-webkit-details-marker{display:none}
+.ph-top{display:flex;align-items:center;gap:11px}
+.ph-tick{width:4px;height:34px;border-radius:3px;flex-shrink:0}
+.ph-id{flex:1;min-width:0}
+.ph-id .nm{font-weight:600;font-size:14.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ph-id .nm .tag{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.06em;
+  padding:2px 7px;border-radius:20px;border:1px solid var(--line2);color:var(--muted)}
+.ph-id .win{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px}
+.ph-pct{font-family:var(--mono);font-weight:700;font-size:19px;text-align:right}
+.ph-pct s{font-size:11px;color:var(--faint);text-decoration:none;margin-left:1px}
+.ph-chev{color:var(--faint);font-size:13px;transition:transform .2s;margin-left:2px}
+.phase[open] .ph-chev{transform:rotate(90deg)}
+.ph-bar{height:5px;border-radius:4px;background:rgba(255,255,255,.06);margin-top:12px;overflow:hidden}
+.ph-bar i{display:block;height:100%;border-radius:4px;transition:width .35s}
+.ph-thesis{font-size:12px;color:var(--muted);padding:0 16px 4px;margin-top:-2px}
+.ms{border-top:1px solid var(--line);padding:6px 10px 12px}
+.mi{display:flex;align-items:center;gap:11px;padding:9px 7px;border-radius:9px}
+.mi:hover{background:var(--panel2)}
+.mi .box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--todo);flex-shrink:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;transition:.15s;background:transparent}
+.mi .tx{flex:1;font-size:13px;color:var(--text)}
+.mi .wt{font-family:var(--mono);font-size:10px;color:var(--faint)}
+.mi[data-s="done"] .box{background:var(--done);border-color:var(--done);color:#06231a}
+.mi[data-s="done"] .tx{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--faint)}
+.mi[data-s="in_progress"] .box{border-color:var(--active);color:var(--active);background:rgba(251,191,36,.12)}
+.mi[data-s="in_progress"] .tx{color:var(--text)}
+
+/* ── log archive ── */
+.log{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:14px 15px;margin-bottom:10px;
+  display:flex;gap:14px;align-items:flex-start}
+.log .when{flex-shrink:0;text-align:center;width:52px;padding-top:1px}
+.log .when .d{font-family:var(--mono);font-weight:700;font-size:18px;line-height:1}
+.log .when .mo{font-family:var(--mono);font-size:9.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.log .when .day{font-family:var(--mono);font-size:9px;color:var(--done);margin-top:6px;border:1px solid var(--line2);border-radius:20px;padding:1px 0}
+.log .body{flex:1;min-width:0}
+.log .body .ti{font-weight:600;font-size:14px}
+.log .body .fo{display:flex;flex-wrap:wrap;gap:5px;margin:7px 0}
+.log .body .fo span{font-family:var(--mono);font-size:9.5px;color:var(--muted);background:var(--ink2);border:1px solid var(--line);border-radius:6px;padding:2px 7px}
+.log .body .su{font-size:12px;color:var(--muted);line-height:1.5}
+.log .body .dl{display:flex;gap:8px;margin-top:11px}
+.log .body .dl a{font-family:var(--mono);font-size:11px;font-weight:500;padding:5px 12px;border-radius:8px;
+  border:1px solid var(--line2);color:var(--text);display:inline-flex;align-items:center;gap:5px;transition:.15s}
+.log .body .dl a:hover{background:var(--panel2);border-color:var(--done)}
+.log .body .dl a .ic{color:var(--done)}
+.log .body .dl a.pdf .ic{color:#FB7185}
+
+/* ── footer ── */
+footer{margin-top:36px;padding:18px 2px 0;border-top:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}
+footer .l{font-family:var(--mono);font-size:11px;color:var(--faint)}
+footer .l b{color:var(--muted)}
+footer .reset{font-family:var(--mono);font-size:10.5px;color:var(--faint);border:1px solid var(--line);
+  border-radius:8px;padding:5px 11px;cursor:pointer;background:transparent;transition:.15s}
+footer .reset:hover{border-color:#FB7185;color:#FB7185}
+
+@media (max-width:560px){
+  body{padding:0 12px}
+  .hero{gap:18px;justify-content:center}
+  .gauge{width:138px;height:138px}
+  .hero .lede h1{font-size:21px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  header .dday .val{font-size:19px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="name" id="brandName">BACKEND <b>JOURNEY</b></div>
+    <div class="flag" id="brandFlag"></div>
+  </div>
+  <div class="dday">
+    <div class="lab">전역까지</div>
+    <div class="val mono" id="dday">—</div>
+    <div class="sub mono" id="ddaySub"></div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="gauge">
+    <svg width="156" height="156" viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="52" fill="none" stroke="#1B2540" stroke-width="11"/>
+      <circle id="gaugeArc" cx="60" cy="60" r="52" fill="none" stroke="url(#gaugeGrad)"
+              stroke-width="11" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+      <defs><linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#34D399"/><stop offset="1" stop-color="#7DA2FF"/>
+      </linearGradient></defs>
+    </svg>
+    <div class="pct"><b id="overallPct">0<span>%</span></b><small>전체 완료</small></div>
+  </div>
+  <div class="lede">
+    <h1 id="subtitleH"></h1>
+    <div class="where"><span class="dot" id="curDot"></span>
+      <span class="ph" id="curPhase">—</span><span class="win mono" id="curWin"></span></div>
+    <div class="day mono" id="dayLine"></div>
+  </div>
+</section>
+
+<div class="stats" id="stats"></div>
+
+<section class="sec">
+  <div class="sec-h"><span class="idx mono">01</span><h2>9개월 원장 타임라인</h2>
+    <span class="hint mono">← 옆으로 밀기 →</span></div>
+  <div class="tl-wrap"><div class="tl-scroll"><div class="tl" id="timeline"></div></div></div>
+</section>
+
+<section class="sec">
+  <div class="sec-h"><span class="idx mono">02</span><h2>레이어 · 마일스톤</h2>
+    <span class="hint mono">탭해서 체크 →</span></div>
+  <div id="phases"></div>
+</section>
+
+<section class="sec">
+  <div class="sec-h"><span class="idx mono">03</span><h2>작업기록 아카이브</h2>
+    <span class="hint mono" id="logCount"></span></div>
+  <div id="logs"></div>
+</section>
+
+<footer>
+  <div class="l">단일 진실 공급원 · <b>roadmap.json</b> → <b>build.py</b> → 이 화면</div>
+  <button class="reset" id="resetBtn">체크 초기화</button>
+</footer>
+
+<script>
+/*<ROADMAP>*/
+const ROADMAP = {
+  "meta": {
+    "title": "BACKEND JOURNEY",
+    "subtitle": "결제·정산 × LLM 시스템 — 토스/SK 티어 표적",
+    "owner": "Taewoo-Won",
+    "journey_start": "2026-06-19",
+    "discharge_date": "2027-03-21",
+    "flagship": "밑바닥부터 만든 트랜잭션 원장 + AI 운영 레이어",
+    "repo": "github.com/Taewoo-Won/mini-ledger",
+    "note": "이 파일이 단일 진실 공급원이다. 마일스톤 status(todo/in_progress/done)와 logs를 여기서 고치고, build.py를 돌리면 대시보드(index.html)에 반영된다. discharge_date는 본인 실제 전역일로 바꿔라."
+  },
+  "phases": [
+    {
+      "id": "p1",
+      "name": "기초 + 시야",
+      "tag": "Foundations",
+      "window": "6–7월",
+      "start": "2026-06",
+      "end": "2026-07",
+      "color": "#7DA2FF",
+      "thesis": "Java/Spring/JPA 기초 + Git + 첫 API. 저수준 감각도 맛본다.",
+      "milestones": [
+        {
+          "id": "m101",
+          "title": "개발환경 셋업 (VPS·JDK21·git·GitHub·gh)",
+          "weight": 2,
+          "status": "done",
+          "done": "2026-06-19"
+        },
+        {
+          "id": "m102",
+          "title": "Java 기초 (변수·조건·클래스·메서드·리스트·맵·예외)",
+          "weight": 4,
+          "status": "in_progress"
+        },
+        {
+          "id": "m103",
+          "title": "mini-ledger (Account·Bank·transfer·예외·기록)",
+          "weight": 4,
+          "status": "in_progress"
+        },
+        {
+          "id": "m104",
+          "title": "Git/GitHub 워크플로 (커밋·푸시·잔디)",
+          "weight": 1,
+          "status": "done",
+          "done": "2026-06-19"
+        },
+        {
+          "id": "m105",
+          "title": "첫 Spring Boot 이체 API (POST→잔액 변경 확인)",
+          "weight": 4,
+          "status": "todo"
+        },
+        {
+          "id": "m106",
+          "title": "CodeCrafters 'Build Your Own Redis' 1단계 맛보기",
+          "weight": 2,
+          "status": "todo"
+        },
+        {
+          "id": "m107",
+          "title": "7월 말 속도 점검",
+          "weight": 1,
+          "status": "todo"
+        }
+      ]
+    },
+    {
+      "id": "p2",
+      "name": "Layer 0 — From-scratch 코어",
+      "tag": "천장 · 리스크",
+      "window": "8–11월",
+      "start": "2026-08",
+      "end": "2026-11",
+      "color": "#F472B6",
+      "thesis": "JPA/Postgres 아래를 직접 만든다. ORM 아래를 안다는 증거 — T2의 심장.",
+      "milestones": [
+        {
+          "id": "m201",
+          "title": "append-only WAL (write-ahead log) 설계·구현",
+          "weight": 6,
+          "status": "todo"
+        },
+        {
+          "id": "m202",
+          "title": "크래시 복구 (로그 재생)",
+          "weight": 5,
+          "status": "todo"
+        },
+        {
+          "id": "m203",
+          "title": "간단한 인덱스 (해시 또는 mini B-tree)",
+          "weight": 4,
+          "status": "todo"
+        },
+        {
+          "id": "m204",
+          "title": "동시 접근 제어 (잠금 또는 MVCC)",
+          "weight": 6,
+          "status": "todo"
+        },
+        {
+          "id": "m205",
+          "title": "벤치마크 (복구 시간·처리량)",
+          "weight": 2,
+          "status": "todo"
+        },
+        {
+          "id": "m206",
+          "title": "SQLD 자격증 (8월, 필터 통과용)",
+          "weight": 2,
+          "status": "todo"
+        }
+      ]
+    },
+    {
+      "id": "p3",
+      "name": "Layer 1 — 도메인 원장",
+      "tag": "결제·정산",
+      "window": "8–11월",
+      "start": "2026-09",
+      "end": "2026-12",
+      "color": "#34D399",
+      "thesis": "L0 위에 복식부기 결제·정산 원장. 네가 만든 토대 위라 격이 다르다.",
+      "milestones": [
+        {
+          "id": "m301",
+          "title": "계좌·이체 + 멱등성 키",
+          "weight": 4,
+          "status": "todo"
+        },
+        {
+          "id": "m302",
+          "title": "정산 (수수료 분배)",
+          "weight": 3,
+          "status": "todo"
+        },
+        {
+          "id": "m303",
+          "title": "환불",
+          "weight": 2,
+          "status": "todo"
+        },
+        {
+          "id": "m304",
+          "title": "감사 로그",
+          "weight": 2,
+          "status": "todo"
+        },
+        {
+          "id": "m305",
+          "title": "동시성 안전 (L0 잠금/MVCC 적용)",
+          "weight": 3,
+          "status": "todo"
+        }
+      ]
+    },
+    {
+      "id": "p4",
+      "name": "Layer 2 — AI 운영·신뢰성",
+      "tag": "최대 차별화",
+      "window": "12–1월",
+      "start": "2026-12",
+      "end": "2027-01",
+      "color": "#A78BFA",
+      "thesis": "결제급 신뢰성을 AI에 융합. 래퍼가 아닌 시스템 규율 — 미래 그 자체.",
+      "milestones": [
+        {
+          "id": "m401",
+          "title": "에이전트 액션 (리콘실·이상조사·배치)",
+          "weight": 3,
+          "status": "todo"
+        },
+        {
+          "id": "m402",
+          "title": "멱등성 키 가드 (재시도 LLM 이중실행 방지)",
+          "weight": 3,
+          "status": "todo"
+        },
+        {
+          "id": "m403",
+          "title": "트랜잭션 보장 (전부 커밋 또는 전부 롤백)",
+          "weight": 3,
+          "status": "todo"
+        },
+        {
+          "id": "m404",
+          "title": "HITL 인터럽트 (고액 액션 일시정지·확인)",
+          "weight": 3,
+          "status": "todo"
+        },
+        {
+          "id": "m405",
+          "title": "감사 추적 + eval 트레이스",
+          "weight": 2,
+          "status": "todo"
+        },
+        {
+          "id": "m406",
+          "title": "비용 대시보드 (태스크당 토큰 비용)",
+          "weight": 2,
+          "status": "todo"
+        }
+      ]
+    },
+    {
+      "id": "p5",
+      "name": "Layer 3 — 관측성",
+      "tag": "Observability",
+      "window": "12–1월",
+      "start": "2026-12",
+      "end": "2027-01",
+      "color": "#22D3EE",
+      "thesis": "기존 거래 모니터링이 전체의 관측 레이어가 된다.",
+      "milestones": [
+        {
+          "id": "m501",
+          "title": "실시간 집계 대시보드",
+          "weight": 3,
+          "status": "todo"
+        },
+        {
+          "id": "m502",
+          "title": "이상 감지 (AI 에이전트에 피드)",
+          "weight": 3,
+          "status": "todo"
+        },
+        {
+          "id": "m503",
+          "title": "메트릭",
+          "weight": 2,
+          "status": "todo"
+        }
+      ]
+    },
+    {
+      "id": "p6",
+      "name": "규율 + OSS",
+      "tag": "학위 동등 무기",
+      "window": "2월",
+      "start": "2027-02",
+      "end": "2027-02",
+      "color": "#FBBF24",
+      "thesis": "포스트모템·ADR·다이어그램·영문 README + 메이저 OSS 기여 착수.",
+      "milestones": [
+        {
+          "id": "m601",
+          "title": "메타 산출물 (eval·비용·포스트모템·ADR·다이어그램·영문 README)",
+          "weight": 3,
+          "status": "todo"
+        },
+        {
+          "id": "m602",
+          "title": "메이저 OSS 1건 기여 (표적 회사 자사 repo 우선)",
+          "weight": 5,
+          "status": "todo"
+        },
+        {
+          "id": "m603",
+          "title": "코딩테스트 시작 (백준·프로그래머스)",
+          "weight": 3,
+          "status": "todo"
+        }
+      ]
+    },
+    {
+      "id": "p7",
+      "name": "가시성 + 접촉 + 지원",
+      "tag": "사파 · 우회",
+      "window": "12–4월",
+      "start": "2026-12",
+      "end": "2027-04",
+      "color": "#FB923C",
+      "thesis": "글로 발견되게(서류 필터 우회) + 일찍 접촉(76%) + 전역 직후 지원.",
+      "milestones": [
+        {
+          "id": "m701",
+          "title": "from-scratch WAL 글 + AI 신뢰성 글 공개 (velog·긱뉴스·X)",
+          "weight": 3,
+          "status": "todo"
+        },
+        {
+          "id": "m702",
+          "title": "일찍 접촉 (6–7개월차 초안 피드백·반복)",
+          "weight": 2,
+          "status": "todo"
+        },
+        {
+          "id": "m703",
+          "title": "지원 (토스·카카오페이·네이버페이·카뱅 + 결제·정산 직결)",
+          "weight": 2,
+          "status": "todo"
+        },
+        {
+          "id": "m704",
+          "title": "면접 (모든 답을 플래그십 레이어에서 길어오기)",
+          "weight": 3,
+          "status": "todo"
+        }
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "date": "2026-06-19",
+      "title": "개발환경 셋업",
+      "focus": [
+        "VPS",
+        "JDK21",
+        "git",
+        "gh"
+      ],
+      "summary": "8-K 봇 은퇴·아카이브, JDK21 설치, git/SSH 키, java-practice 첫 커밋·푸시·잔디."
+    },
+    {
+      "date": "2026-06-20",
+      "title": "증분1 · Account",
+      "focus": [
+        "클래스",
+        "메서드"
+      ],
+      "summary": "Account 클래스(돈은 long, 검증 먼저), deposit/withdraw, mini-ledger repo 생성·커밋 9e671d6."
+    },
+    {
+      "date": "2026-06-21",
+      "title": "증분2 · Bank/createAccount",
+      "focus": [
+        "Map",
+        "객체생성"
+      ],
+      "summary": "Bank 필드+createAccount, 'Bank엔 왜 this.id 없나' 4단계 해부, 작업폴더 디버깅, 커밋 e02b204."
+    },
+    {
+      "date": "2026-06-22",
+      "title": "증분2 · getAccount",
+      "focus": [
+        "null",
+        "반환타입"
+      ],
+      "summary": "getAccount 구현, Map.get는 null 반환, 스마트 구두점(둥근 따옴표) 함정 영구 해결."
+    },
+    {
+      "date": "2026-06-23",
+      "title": "증분2 완료 · transfer + Main",
+      "focus": [
+        "안전한 순서",
+        "위임"
+      ],
+      "summary": "transfer를 답 안 받고 구현(출금→입금), Main 실행증명 1100/4500, 16개 오답 전면 해부. 커밋 9cc49e6."
+    }
+  ]
+};
+/*</ROADMAP>*/
+
+const LS_KEY = "bj_overrides_v1";
+const MONTHS = ["6월","7월","8월","9월","10월","11월","12월","1월","2월","3월","4월"];
+const credit = s => s==="done"?1 : s==="in_progress"?0.5 : 0;
+const monthIdx = ym => { const [y,m]=ym.split("-").map(Number); return (y-2026)*12 + (m-6); };
+const daysBetween = (a,b)=> Math.round((b-a)/86400000);
+const parseD = s => { const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); };
+
+function loadOverrides(){ try{ return JSON.parse(localStorage.getItem(LS_KEY))||{}; }catch(e){ return {}; } }
+function saveOverrides(o){ try{ localStorage.setItem(LS_KEY, JSON.stringify(o)); }catch(e){} }
+let overrides = loadOverrides();
+
+function statusOf(m){ return overrides[m.id] || m.status; }
+
+function metrics(){
+  let tw=0, cw=0, msDone=0, msTot=0, msAct=0, phDone=0;
+  ROADMAP.phases.forEach(p=>{
+    let allDone=true;
+    p.milestones.forEach(m=>{
+      const s=statusOf(m); tw+=m.weight; cw+=m.weight*credit(s);
+      msTot++; if(s==="done")msDone++; else allDone=false; if(s==="in_progress")msAct++;
+    });
+    if(allDone) phDone++;
+  });
+  const today=new Date(); today.setHours(0,0,0,0);
+  const start=parseD(ROADMAP.meta.journey_start), disc=parseD(ROADMAP.meta.discharge_date);
+  const dayN=daysBetween(start,today)+1, totalD=daysBetween(start,disc), dDay=daysBetween(today,disc);
+  return {
+    overall: Math.round(cw/tw*100),
+    msDone, msTot, msAct, phDone, phTot: ROADMAP.phases.length,
+    dayN, totalD, dDay, daysLogged: ROADMAP.logs.length,
+    timePct: Math.round(dayN/totalD*100)
+  };
+}
+function phasePct(p){
+  let tw=0,cw=0; p.milestones.forEach(m=>{tw+=m.weight;cw+=m.weight*credit(statusOf(m));});
+  return tw? Math.round(cw/tw*100):0;
+}
+function curPhase(){
+  // 진행 중인(미완) 첫 페이즈 = 현재 위치
+  for(const p of ROADMAP.phases){ if(p.milestones.some(m=>statusOf(m)!=="done")) return p; }
+  return ROADMAP.phases[ROADMAP.phases.length-1];
+}
+
+/* ── render: static-ish header/hero ── */
+function renderShell(){
+  const M=ROADMAP.meta;
+  document.getElementById("brandFlag").textContent = "🏴 "+M.flagship;
+  document.getElementById("brandFlag").textContent = M.flagship;
+  document.getElementById("subtitleH").textContent = M.subtitle;
+}
+function renderTop(mx){
+  document.getElementById("dday").textContent = "D-"+mx.dDay;
+  document.getElementById("ddaySub").textContent = mx.discharge||("~"+ROADMAP.meta.discharge_date);
+  const p=curPhase();
+  document.getElementById("curDot").style.background=p.color;
+  document.getElementById("curPhase").textContent=p.name;
+  document.getElementById("curWin").textContent="· "+p.window;
+  document.getElementById("dayLine").innerHTML=
+    `Day <b>${mx.dayN}</b> / ${mx.totalD} &nbsp;·&nbsp; 시간 경과 ${mx.timePct}% &nbsp;·&nbsp; 기록 ${mx.daysLogged}일`;
+}
+function renderGauge(pct){
+  const C=326.7; document.getElementById("gaugeArc").style.strokeDashoffset=C*(1-pct/100);
+  document.getElementById("overallPct").innerHTML=pct+'<span>%</span>';
+}
+function renderStats(mx){
+  const cards=[
+    {n:`${mx.phDone}<s>/${mx.phTot}</s>`, l:"레이어 완료"},
+    {n:`${mx.msDone}<s>/${mx.msTot}</s>`, l:"마일스톤 달성"},
+    {n:`${mx.msAct}`, l:"진행 중"},
+    {n:`${mx.daysLogged}`, l:"기록한 날"}
+  ];
+  document.getElementById("stats").innerHTML=cards.map(c=>
+    `<div class="stat"><div class="n mono">${c.n}</div><div class="l">${c.l}</div></div>`).join("");
+}
+
+/* ── render: ledger timeline ── */
+function renderTimeline(){
+  const months = MONTHS.map((m,i)=>{
+    const yr = (m==="6월")?"’26":(m==="1월")?"’27":"";
+    return `<div class="m ${yr?'yr':''}">${m}${yr?'<br>'+yr:''}</div>`;
+  }).join("");
+  let rows="";
+  ROADMAP.phases.forEach(p=>{
+    const s=monthIdx(p.start), e=monthIdx(p.end);
+    const left=(s/11*100), width=((e-s+1)/11*100), pct=phasePct(p);
+    rows+=`<div class="tl-row"><div class="lab"><span class="d" style="background:${p.color}"></span>
+      <span class="t" style="color:${p.color}">${p.name.replace('Layer ','L')}</span></div>
+      <div class="tl-track">
+        <div class="tl-grid">${'<span></span>'.repeat(11)}</div>
+        <div class="tl-bar" style="left:${left}%;width:${width}%">
+          <div class="fill" data-tlfill="${p.id}" style="width:${pct}%;background:${p.color}"></div>
+          <div class="pc">${pct}%</div>
+        </div>
+      </div></div>`;
+  });
+  // today line
+  const today=new Date(); const ti=(today.getFullYear()-2026)*12+(today.getMonth()-5)
+    + (today.getDate()-1)/new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
+  const tleft = Math.max(0,Math.min(100, ti/11*100));
+  const labelW=128;
+  document.getElementById("timeline").innerHTML=
+    `<div class="tl-months"><div class="sp"></div>${months}</div>${rows}
+     <div class="tl-today" style="left:calc(${labelW}px + (100% - ${labelW}px) * ${tleft/100})"></div>`;
+}
+
+/* ── render: phases + milestones ── */
+function renderPhases(){
+  const wrap=document.getElementById("phases");
+  wrap.innerHTML = ROADMAP.phases.map(p=>{
+    const pct=phasePct(p);
+    const mis=p.milestones.map(m=>{
+      const s=statusOf(m);
+      const mark = s==="done"?"✓" : s==="in_progress"?"◐" : "";
+      return `<div class="mi" data-id="${m.id}" data-s="${s}">
+        <div class="box" data-toggle="${m.id}">${mark}</div>
+        <div class="tx">${m.title}</div><div class="wt mono">${m.weight}</div></div>`;
+    }).join("");
+    return `<details class="phase" data-phase="${p.id}">
+      <summary>
+        <div class="ph-top">
+          <div class="ph-tick" style="background:${p.color}"></div>
+          <div class="ph-id">
+            <div class="nm">${p.name}<span class="tag">${p.tag}</span></div>
+            <div class="win mono">${p.window}</div>
+          </div>
+          <div class="ph-pct mono" data-phpct="${p.id}" style="color:${p.color}">${pct}<s>%</s></div>
+          <div class="ph-chev">▶</div>
+        </div>
+        <div class="ph-bar"><i data-phbar="${p.id}" style="width:${pct}%;background:${p.color}"></i></div>
+      </summary>
+      <div class="ph-thesis">${p.thesis}</div>
+      <div class="ms">${mis}</div>
+    </details>`;
+  }).join("");
+}
+
+/* ── render: logs ── */
+function renderLogs(){
+  const start=parseD(ROADMAP.meta.journey_start);
+  const items=[...ROADMAP.logs].sort((a,b)=>a.date<b.date?1:-1).map(l=>{
+    const d=parseD(l.date), dayN=daysBetween(start,d)+1;
+    const dd=String(d.getDate()).padStart(2,"0"), mo=MONTHS[(d.getFullYear()-2026)*12+(d.getMonth()-5)]||"";
+    const foc=l.focus.map(f=>`<span>${f}</span>`).join("");
+    return `<div class="log">
+      <div class="when"><div class="d mono">${dd}</div><div class="mo mono">${mo}</div>
+        <div class="day mono">D${dayN}</div></div>
+      <div class="body">
+        <div class="ti">${l.title}</div>
+        <div class="fo">${foc}</div>
+        <div class="su">${l.summary}</div>
+        <div class="dl">
+          <a href="logs/${l.date}.md" target="_blank" rel="noopener"><span class="ic">▤</span> MD</a>
+          <a class="pdf" href="logs/${l.date}.pdf" target="_blank" rel="noopener"><span class="ic">▤</span> PDF</a>
+        </div>
+      </div></div>`;
+  }).join("");
+  document.getElementById("logs").innerHTML=items;
+  document.getElementById("logCount").textContent=ROADMAP.logs.length+"개 기록";
+}
+
+/* ── targeted updates on toggle (preserve <details> open state) ── */
+function refreshComputed(){
+  const mx=metrics();
+  renderGauge(mx.overall); renderStats(mx); renderTop(mx);
+  ROADMAP.phases.forEach(p=>{
+    const pct=phasePct(p);
+    const bar=document.querySelector(`[data-phbar="${p.id}"]`);
+    const lab=document.querySelector(`[data-phpct="${p.id}"]`);
+    const tl =document.querySelector(`[data-tlfill="${p.id}"]`);
+    if(bar) bar.style.width=pct+"%";
+    if(lab) lab.innerHTML=pct+'<s>%</s>';
+    if(tl)  tl.style.width=pct+"%";
+    const tlpc = tl && tl.parentElement.querySelector(".pc"); if(tlpc) tlpc.textContent=pct+"%";
+  });
+}
+function cycle(id){
+  const cur = overrides[id] || (ROADMAP.phases.flatMap(p=>p.milestones).find(m=>m.id===id)||{}).status || "todo";
+  const next = cur==="todo" ? "in_progress" : cur==="in_progress" ? "done" : "todo";
+  overrides[id]=next; saveOverrides(overrides);
+  const mi=document.querySelector(`.mi[data-id="${id}"]`);
+  if(mi){ mi.dataset.s=next; mi.querySelector(".box").textContent = next==="done"?"✓":next==="in_progress"?"◐":""; }
+  refreshComputed();
+}
+
+document.addEventListener("click", e=>{
+  const t=e.target.closest("[data-toggle]");
+  if(t){ e.preventDefault(); e.stopPropagation(); cycle(t.dataset.toggle); }
+});
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  overrides={}; saveOverrides(overrides); renderPhases(); refreshComputed();
+});
+
+/* ── boot ── */
+renderShell();
+renderTimeline();
+renderPhases();
+renderLogs();
+refreshComputed();
+</script>
+</body>
+</html>
