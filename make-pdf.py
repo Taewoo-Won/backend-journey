@@ -58,6 +58,7 @@ table code{font-size:8.3pt}
 
 def md_to_pdf(md_path, pdf_path):
     raw = open(md_path, encoding="utf-8").read()
+    raw = re.sub(r"<!--\s*card.*?-->\s*", "", raw, flags=re.S | re.I)  # 카드 메타블록 제거
     for k, v in EMOJI.items():
         raw = raw.replace(k, v)
     m = re.search(r"(20\d\d)[-년\.\s]+(\d{1,2})[-월\.\s]+(\d{1,2})", raw)
