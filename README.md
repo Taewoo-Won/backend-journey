@@ -46,6 +46,12 @@ python3 build.py
 python3 make-pdf.py logs/2026-06-24.md
 ```
 
+`logs/`에 새 작업기록(`.md` / `.pdf`)을 추가한 뒤 `update.py`를 실행하면 인덱스 갱신·빌드·커밋·푸시가 한 번에 처리된다.
+
+```bash
+python3 update.py --done m103 --title "증분3 · 커스텀 예외" --summary "한 줄 요약"
+```
+
 진행률은 단순 개수가 아니라 마일스톤별 `weight`로 가중 계산한다.
 
 ## 기술
