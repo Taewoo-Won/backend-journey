@@ -4,22 +4,30 @@
 수동:  python3 update.py
        python3 update.py --done m103 m105
        python3 update.py --title "..." --focus a,b --summary "..."
-자동:  cron 이 1분마다 이 스크립트를 실행 (인자 없이) → 새 작업기록을 자동 반영.
+자동:  cron 이 1분마다 실행 (인자 없이) → 새 작업기록 자동 반영.
 
-새 작업기록 카드의 제목/태그/요약은 .md 파일 맨 위의 메타블록에서 읽는다:
+조용함 규칙: 변경(새 작업기록·done·실제 파일 변화)이 있을 때만 로그를 남긴다.
+            아무것도 없으면 cron 로그에 아무것도 안 찍는다. (수동 실행 시에만 '변경 없음' 표시)
 
+카드 메타블록(.md 맨 위)에서 제목/태그/요약을 읽는다:
     <!-- card
-    title: 증분3 · 커스텀 예외
-    focus: 예외설계, try/catch
-    summary: 한 줄 요약.
+    title: ...
+    focus: a, b
+    summary: ...
     -->
-
 우선순위: 명령행 인자 > .md 메타블록 > 기본값.
 """
 import json, re, sys, glob, os, subprocess, datetime, pathlib
 
 HERE = pathlib.Path(__file__).parent
 RJ = HERE / "roadmap.json"
+DEVNULL = subprocess.DEVNULL
+
+def git(*args, capture=False):
+    return subprocess.run(["git", *args], cwd=str(HERE),
+                          capture_output=capture, text=True,
+                          stdout=None if capture else DEVNULL,
+                          stderr=DEVNULL if not capture else None)
 
 # ── 인자 파싱 ──
 args = sys.argv[1:]
@@ -66,7 +74,6 @@ for d in [x for x in found if x not in existing]:
         "summary": summary_in or card.get("summary") or "",
     })
     added.append(d)
-road["logs"].sort(key=lambda l: l["date"])
 
 # ── 마일스톤 done 처리 ──
 marked = []
@@ -75,23 +82,31 @@ for p in road["phases"]:
         if m["id"] in done_ids and m["status"] != "done":
             m["status"] = "done"; marked.append(m["id"])
 
-RJ.write_text(json.dumps(road, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-if added:  print("＋ 새 작업기록:", ", ".join(added))
-if marked: print("✓ done 처리:", ", ".join(marked))
+# roadmap.json 은 내용이 바뀐 경우에만 다시 쓴다
+if added or marked:
+    RJ.write_text(json.dumps(road, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-# ── build ──
-if subprocess.run([sys.executable, str(HERE / "build.py")], cwd=str(HERE)).returncode != 0:
-    print("✗ build.py 실패"); sys.exit(1)
+# ── build.py 는 항상 돌리되 출력은 삼킨다 (수동 roadmap.json 편집도 반영되게) ──
+r = subprocess.run([sys.executable, str(HERE / "build.py")], cwd=str(HERE),
+                   stdout=DEVNULL, stderr=subprocess.PIPE, text=True)
+if r.returncode != 0:
+    print("build 실패:", (r.stderr or "").strip()); sys.exit(1)
 
-# ── git: 변경 있으면 커밋, 보낼 게 있으면 푸시 (idle 시 조용) ──
-subprocess.run(["git", "add", "."], cwd=str(HERE))
-has_changes = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=str(HERE)).returncode != 0
+# ── git: 실제 변경/미푸시가 있을 때만 커밋·푸시 ──
+git("add", "."); 
+has_changes = git("diff", "--cached", "--quiet").returncode != 0
 if has_changes:
     msg = "update: " + (", ".join(added) if added else datetime.date.today().isoformat()) \
           + (f" (+{len(marked)} done)" if marked else "")
-    subprocess.run(["git", "commit", "-q", "-m", msg], cwd=str(HERE))
-unpushed = subprocess.run(["git", "rev-list", "origin/main..HEAD", "--count"],
-                          cwd=str(HERE), capture_output=True, text=True).stdout.strip()
+    git("commit", "-q", "-m", msg)
+unpushed = git("rev-list", "origin/main..HEAD", "--count", capture=True).stdout.strip()
+pushed = False
 if has_changes or (unpushed and unpushed != "0"):
-    subprocess.run(["git", "push", "-q"], cwd=str(HERE))
-    print("→ 푸시 완료 · https://taewoo-won.github.io/backend-journey/ (1분 뒤 반영)")
+    git("push", "-q"); pushed = True
+
+# ── 로그: 변경 있을 때만. 없으면 (cron) 침묵, (수동) 한 줄. ──
+if added:  print("＋ 새 작업기록:", ", ".join(added))
+if marked: print("✓ done 처리:", ", ".join(marked))
+if pushed: print("→ 푸시 완료 · https://taewoo-won.github.io/backend-journey/ (1분 뒤 반영)")
+if not (added or marked or pushed) and sys.stdout.isatty():
+    print("· 변경 없음 (대시보드 이미 최신)")
