@@ -598,9 +598,11 @@ const monthIdx = ym => { const [y,m]=ym.split("-").map(Number); return (y-2026)*
 const daysBetween = (a,b)=> Math.round((b-a)/86400000);
 const parseD = s => { const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); };
 
-function loadOverrides(){ try{ return JSON.parse(localStorage.getItem(LS_KEY))||{}; }catch(e){ return {}; } }
-function saveOverrides(o){ try{ localStorage.setItem(LS_KEY, JSON.stringify(o)); }catch(e){} }
-let overrides = loadOverrides();
+// 토글은 이 브라우저에서 '임시 미리보기'만 한다 — 저장하지 않는다.
+// 새로고침하면 roadmap.json 기준으로 초기화된다. (진짜 진행률은 roadmap.json 만 정한다)
+try { localStorage.removeItem(LS_KEY); } catch (e) {}   // 예전 버전이 저장해둔 값 정리
+function saveOverrides(o) { /* 의도적으로 저장 안 함 (세션 한정 미리보기) */ }
+let overrides = {};
 
 function statusOf(m){ return overrides[m.id] || m.status; }
 
