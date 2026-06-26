@@ -370,6 +370,17 @@
         "예외설계"
       ],
       "summary": "AccountNotFoundException/InsufficientBalanceException 도입(첫 상속·super), Bank·Account 배선, try/catch로 ②③를 잡아 \"돈 증발 없음\"을 프로그램으로 증명. 커밋 532825f."
+    },
+    {
+      "date": "2026-06-26",
+      "title": "증분3 복기 (기억으로 재현) + 컴 환경 구축",
+      "focus": [
+        "복기",
+        "독타이핑",
+        "IntelliJ",
+        "본진 clone"
+      ],
+      "summary": "6/23 깡통 상태에서 정답 안 보고 기억만으로 증분3(커스텀 예외+try/catch) 전체를 직접 재현. IntelliJ 본진(git clone) 세팅 완료. 9개 \"왜?\" 질문 도출."
     }
   ]
 }
