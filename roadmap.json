@@ -394,6 +394,19 @@
         "게터"
       ],
       "summary": "증분4 첫 조각 완성. 거래의 데이터 모델(TransactionType enum + Transaction 클래스)을 직접 설계·구현. from/to를 null로 비우는 모델링, timestamp를 생성자 안에서 LocalDateTime.now()로 찍는 결정을 스스로 내림. 14개 오류를 단계별로 잡아 컴파일 통과 → 커밋 403ef81."
+    },
+    {
+      "date": "2026-06-28",
+      "title": "증분4 (2/3·3/3) — Bank 출입구 + 거래 이력(감사 로그) 완성",
+      "focus": [
+        "funnel 설계",
+        "history.add",
+        "from/to",
+        "getHistory",
+        "향상된 for",
+        "제네릭"
+      ],
+      "summary": "증분4 완성. Bank를 유일한 출입구(funnel)로 만들어 모든 돈 이동을 통과시키고, 통과할 때마다 영수증(Transaction)을 history에 기록 = 감사 로그. getHistory()로 꺼내 향상된 for문으로 출력까지. \"Bank가 길목이고 Transaction은 영수증\"이라는 핵심 구분을 스스로 교정. 커밋 fb3897b."
     }
   ]
 }
