@@ -381,6 +381,19 @@
         "본진 clone"
       ],
       "summary": "6/23 깡통 상태에서 정답 안 보고 기억만으로 증분3(커스텀 예외+try/catch) 전체를 직접 재현. IntelliJ 본진(git clone) 세팅 완료. 9개 \"왜?\" 질문 도출."
+    },
+    {
+      "date": "2026-06-27",
+      "title": "증분4 데이터 모델 — TransactionType enum + Transaction 클래스",
+      "focus": [
+        "enum",
+        "클래스 설계",
+        "from/to 모델링",
+        "타입(기본 vs 클래스)",
+        "생성자",
+        "게터"
+      ],
+      "summary": "증분4 첫 조각 완성. 거래의 데이터 모델(TransactionType enum + Transaction 클래스)을 직접 설계·구현. from/to를 null로 비우는 모델링, timestamp를 생성자 안에서 LocalDateTime.now()로 찍는 결정을 스스로 내림. 14개 오류를 단계별로 잡아 컴파일 통과 → 커밋 403ef81."
     }
   ]
 }
