@@ -432,6 +432,18 @@
         "return≠출력"
       ],
       "summary": "Layer 1 환불의 온램프인 \"특정 계좌 거래만 조회\"를 구현. 5단계를 처음 혼자 몰며 ②에서 \"Main이냐 Bank냐\"를 스스로 교정(history가 private이라 Bank). 필터링 공식(빈 바구니→순회→if 담기→반환)을 체득하고, .equals vs ==, 매개변수=빈칸, return은 건네기지 출력이 아님까지 끝까지 파서 온전히 내 것으로 만듦. 커밋 완료."
+    },
+    {
+      "date": "2026-07-01",
+      "title": "금액 필터 조회 — 필터링 공식 2회차 + IntelliJ 복귀·동기화 정립",
+      "focus": [
+        "getHistoryAbove",
+        "필터링 공식 재사용",
+        "문자열 equals vs 숫자 부등호",
+        "git sync",
+        "2-머신 동기화"
+      ],
+      "summary": "시간 30분 제약 속에서 환불(설계 무거움) 대신 금액 필터 조회(getHistoryAbove)로 필터링 공식을 2회차 반복 — 조건만 .equals()에서 >= 로 바꿔 재사용. IntelliJ 본진 복귀 후 5개 밀린 커밋을 stash→pull로 동기화하고, git sync alias로 앞으로 한 단어화. 코딩은 컴·잔디는 폰/VPS 원칙 유지, push 유혹을 원칙으로 차단."
     }
   ]
 }
