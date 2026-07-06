@@ -721,6 +721,19 @@ const ROADMAP = {
         "checkBalance 호출"
       ],
       "summary": "하루에 세 개를 했다. ①어제 \"정산 완결\"이 사실 반쪽(해피패스만)이었던 걸 발견 — 다른 Claude가 원자성 구멍을 짚었고, a=1010 트레이스로 반쪽 커밋+멱등성 깨짐을 눈으로 확인, \"검증은 상태 변경 전에\"로 수정(fee 계산·검증을 withdraw 위로). ②복식부기(A안): 거래를 계좌별 부호(from -, to +)로 변환해 Map에 누적하고 합=0인지 검증하는 checkBalance를 작성. ③그걸 transfer 끝에서 실제 호출해 원자성이 돈 보존을 지키는지 수학적으로 증명. 이로써 mini-ledger Layer 1(감사로그·멱등성·조회·환불·정산·복식부기) 전부 완성."
+    },
+    {
+      "date": "2026-07-06",
+      "title": "첫 HTTP 서버 — Spring Boot로 mini-ledger 졸업 (m105 조각 1)",
+      "focus": [
+        "Spring Boot 부트스트랩",
+        "@RestController/@GetMapping",
+        "bootRun",
+        "curl 검증(200 OK)",
+        "백그라운드 실행(&)",
+        "잔디 이메일 최종 검증(login 확인)"
+      ],
+      "summary": "순수 Java(mini-ledger)를 졸업하고 첫 웹 서버를 띄운 날. start.spring.io로 뼈대를 받고, /health에 \"ledger-api alive\"로 답하는 HealthController를 작성(package·@RestController·@GetMapping 첫 등장). bootRun으로 Tomcat 8080 기동 — 16분은 Gradle 최초 다운로드였고 서버 자체는 4.3초에 떴다. 새 탭을 못 열어 백그라운드(&)로 우회했고, curl이 무반응처럼 보인 건 응답에 개행이 없어서였음을 curl -v(200 OK·16바이트)로 확인. \"동작 확인 → 커밋\" 순서를 지켜 검증된 것만 push했고, 어제 고친 잔디 이메일이 실제로 먹히는지 GitHub API의 \"login\": \"Taewoo-Won\"으로 최종 검증. 오늘의 세 가지 착시(16분·curl·잔디)를 전부 \"가정 말고 확인\"으로 뚫었다."
     }
   ]
 };
