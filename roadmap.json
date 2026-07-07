@@ -507,6 +507,20 @@
         "잔디 이메일 최종 검증(login 확인)"
       ],
       "summary": "순수 Java(mini-ledger)를 졸업하고 첫 웹 서버를 띄운 날. start.spring.io로 뼈대를 받고, /health에 \"ledger-api alive\"로 답하는 HealthController를 작성(package·@RestController·@GetMapping 첫 등장). bootRun으로 Tomcat 8080 기동 — 16분은 Gradle 최초 다운로드였고 서버 자체는 4.3초에 떴다. 새 탭을 못 열어 백그라운드(&)로 우회했고, curl이 무반응처럼 보인 건 응답에 개행이 없어서였음을 curl -v(200 OK·16바이트)로 확인. \"동작 확인 → 커밋\" 순서를 지켜 검증된 것만 push했고, 어제 고친 잔디 이메일이 실제로 먹히는지 GitHub API의 \"login\": \"Taewoo-Won\"으로 최종 검증. 오늘의 세 가지 착시(16분·curl·잔디)를 전부 \"가정 말고 확인\"으로 뚫었다."
+    },
+    {
+      "date": "2026-07-07",
+      "title": "m105 완주 — Bank가 HTTP API가 된 날 (POST /transfer, 멱등성 실전 검증)",
+      "focus": [
+        "record(DTO)",
+        "@PostMapping/@RequestBody",
+        "JSON 자동 변환(잭슨)",
+        "상태를 가진 컨트롤러",
+        "curl POST",
+        "멱등성의 HTTP 작동",
+        "git rm --cached"
+      ],
+      "summary": "mini-ledger의 Bank를 ledger-api에 이식해 POST /transfer로 태웠다. 도메인 로직은 한 줄도 안 바꾸고 호출자만 Main→curl로 교체. 오늘 처음 만난 개념 — record(필드+생성자+접근자를 한 줄로, 접근자는 get 없이 fromId()), @RequestBody(JSON을 record로 자동 변환하는 마법 ④), 상태를 가진 컨트롤러(서버가 사는 동안 같은 Bank가 살아 요청 간 잔액·usedKeys가 이어짐) — 를 풀코드와 함께 정밀 해설. 검증: key-1 이체(a 1080) → 같은 key-1 재시도 잔액 불변(★멱등성이 HTTP에서 작동, Stripe·토스 패턴 그대로) → key-2 정상 처리(a 60) → \"돈 보존됨\" 정확히 2번(실제 이체만 checkBalance 통과). 트러블슈팅 3건: IntelliJ 먹통→VPS nano 우회, 404의 진짜 원인=nano 저장 실패로 파일 부재, kill %2 후 자식 java 확인은 ss 빈 출력으로. 커밋 d0d6f9c, update.py --done m105로 마일스톤 닫음."
     }
   ]
 }
