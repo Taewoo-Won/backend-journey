@@ -50,7 +50,7 @@
           "id": "m105",
           "title": "첫 Spring Boot 이체 API (POST → 잔액 변경 확인)",
           "weight": 4,
-          "status": "todo"
+          "status": "done"
         },
         {
           "id": "m106",
