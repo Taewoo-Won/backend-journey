@@ -609,6 +609,17 @@
         "VPS에 브라우저 IDE(code-server) 띄워 폰 편집환경 확보 시험"
       ],
       "summary": "어제 §6에 설계해둔 조각 2를 완주했다 — 에러 응답이 자유 문자열(\"이체 실패: ...\")에서 구조화 JSON({\"code\":\"...\",\"message\":\"...\"})으로 바뀌었다. 두 번째 record인 ErrorResponse(String code, String message)를 태우가 직접 작성(교정 2곳: 첫 필드 누락 → code 채움, 대문자 시작 Message → 소문자 message), 핸들러 3개의 <String>을 <ErrorResponse>로 교체하고 body에 new ErrorResponse(\"대문자상수\", e.getMessage())를 넣었다. code 값 3개(ACCOUNT_NOT_FOUND/INVALID_AMOUNT/INSUFFICIENT_BALANCE)는 예외 클래스명에서 따오되 IllegalArgumentException만은 JDK 공용이라 클래스명 대신 \"이 컨트롤러에서 실제로 뭐가 잘못됐나\"(INVALID_AMOUNT)로 좁혔다. ★오늘의 핵심 깨달음: code가 왜 필요한가 — message 하나면 앱이 분기하려고 한글 문장을 contains로 검사해야 하고(어제 Q2의 \"끔찍하다\"), 문구 하나 바꾸면 조용히 깨진다. code는 절대 안 바뀌는 영문 상수라 앱이 그걸로 분기하고 message는 화면에 그냥 띄운다. 이건 새 문법이 아니라 \"왜 필드가 2개인가\"의 설계 결정이라, message처럼 문장 뜻에서 유추가 안 됐다(태우: \"뜬금없다\"). 검증: 4연타(3에러+1회귀) 전부 통과 — ★Content-Type이 어제까지 text/plain에서 세 에러 전부 application/json으로 바뀐 순간을 눈으로 확인(record→JSON 직렬화 = 7/7 @RequestBody 마법 ④의 역방향이 처음 가동). 정상 이체(200)는 여전히 text/plain(에러 경로만 손댔으니 당연 — 다음 후보). 커밋 966c93f, 예외 번역 장(7/12~15) 완전 종결. 별건: code-server를 VPS에 띄워 폰 브라우저 편집환경 시험 성공(설치·8443 기동·폰 접속·ledger-api 폴더 열기까지) — 사지방 GitHub 로그인 불가 제약의 우회로, 방화벽만 다음 변수. 서버 둘(8080·8443) 규율대로 정리."
+    },
+    {
+      "date": "2026-07-16",
+      "title": "계약 문서화 — README에 에러 응답 형식 박기 (7/11 원칙 2호 적용)",
+      "focus": [
+        "\"시간 없음 + 잔디 필요\"의 정직한 해법(빈 커밋 대신 실질 5분)",
+        "API 계약 문서화의 의미(구현 다음 날 문서화 흐름)",
+        "grep 0→1 판정 패턴",
+        "heredoc 안 ``` 회피(4칸 들여쓰기)"
+      ],
+      "summary": "시간이 아예 없는 날 + 잔디는 필요한 날 — 7/11에 세운 원칙(\"빈 커밋은 안 만든다, 대신 진짜 5분거리를 찾는다\")이 두 번째로 작동했다. 이번의 실질 5분거리는 어제(966c93f) 태어난 에러 응답 계약(code 3종 + JSON 형식)을 README에 문서화하는 것 — 어제까지 README는 7/10 버전이라 핸들러 이전 상태였다. 절차: grep -c \"에러 응답\" README.md = 0(중복 방지 선판정) → cat >> heredoc(추가 모드, 7/11 도구 재사용)으로 14줄 추가 → grep 재판정 0→1 → 커밋 54e3523 push. 추가한 내용: 에러 JSON 예시 + code 3종 표(ACCOUNT_NOT_FOUND/INVALID_AMOUNT/INSUFFICIENT_BALANCE) + \"code=기계용 불변, message=사람용 가변\" 한 줄. 작은 실전 팁 하나: heredoc 안에 ```(코드블록)를 넣으면 폰 붙여넣기에서 꼬일 수 있어 4칸 들여쓰기로 대체(렌더링 동일). 의미: 문서화 전의 code 상수는 구현 세부사항이지만, README에 박히는 순간 약속(계약)이 된다 — 커밋 이력도 \"기능 구현(966c93f) → 다음 날 계약 문서화(54e3523)\"로 자연스러운 흐름. 오늘 작업기록은 이 파일이 전부이고, 그게 맞는 크기다."
     }
   ]
 }
