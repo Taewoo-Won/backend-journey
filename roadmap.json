@@ -630,6 +630,17 @@
         "착수 기간의 잔디 경로(CodeCrafters push는 잔디에 안 찍힘)"
       ],
       "summary": "수련회(7/17~19) 첫날이라 시간이 거의 없는 날 — m106을 세 번째로 통째 이월하는 대신, 맨 앞 조각(계정 연결)만 떼서 완결했다. codecrafters.io에 GitHub(Taewoo-Won) 로그인 → Build Your Own Redis 코스 → 언어 Java 선택 → git clone 명령 확보까지. 완결점을 \"계정 생성\"이 아니라 \"clone 명령 확보\"로 잡은 이유: 코스·언어를 선택해야 비로소 clone 명령이 발급되므로, 계정만 만들고 멈추면 반쪽이다. 이 5~10분이 실질인 근거: 어제 세운 예상 시간표에서 1번 구간(계정+시작, 8~12분)이 모바일 UI 탐색 때문에 최대 미지수였는데, 그게 오늘 제거됐다 — 내일 세션은 브라우저가 아니라 터미널의 clone 한 줄에서 시작한다. 주의사항 둘을 내일용으로 기록: CodeCrafters의 기본 브랜치는 main이 아니라 master(push origin master), 그리고 그들 git 서버라 push가 GitHub 잔디에 안 찍히므로 m106 기간의 잔디는 작업기록 파일의 logs 커밋 경로다(오늘 잔디도 이 파일). 새 개념 없음 — ServerSocket·accept()는 내일 코드에서 만난다. 내일 플랜: 20분이면 clone+정찰+before 실패 관찰까지(완결 조각), 40분+면 Stage 1 초록 + m106 done까지 완주."
+    },
+    {
+      "date": "2026-07-18",
+      "title": "m106 clone 실행 — 레포 VPS 안착 (수련회 둘째날 조각) + serenity 공존 정리 각주",
+      "focus": [
+        "착수 조각의 두 번째 마디(계정→clone 실행)",
+        "app.codecrafters.io(보는 곳) vs git.codecrafters.io(받는 곳) 구분",
+        "폴더 구조로 내일 빌드 도구(Maven) 미리 파악",
+        "\"정찰과 코드는 같은 호흡\" 원칙 지켜 구조만 보고 내용은 안 엶"
+      ],
+      "summary": "수련회(7/17~19) 둘째날, 어제 확보한 clone 명령을 실제 실행해 codecrafters-redis-java 레포를 VPS(~/)에 안착시켰다. 오늘의 유일한 마찰은 clone 주소 찾기 — 브라우저 주소창(app.codecrafters.io/courses/redis/... = 보는 곳)을 계속 clone 주소로 착각했고, 실제 필요한 건 코스 화면 본문의 \"Clone the repository\" 복붙칸에 있는 git.codecrafters.io/1e6aca72db41e76f(받는 곳)였다. 이 \"보는 곳 vs 받는 곳\" 구분이 오늘 얻은 것. clone 성공(명령에 cd까지 붙어 폴더 안 자동 진입), ls로 codecrafters-redis-java 확인. 구조만 보고(ls -R, 내용은 안 엶) 두 가지 미리 파악: ① pom.xml 존재 = 빌드는 Maven(내일 mvn 없으면 sdk install maven 예고) ② Main.java 위치(src/main/java/) = 내일 정찰+주석 해제 대상. 오늘 정찰(README·Main.java 내용 읽기)을 일부러 안 한 이유: 이 코스는 \"읽으며 주석 해제\"라 정찰과 코드가 같은 호흡이어야 하고, 오늘 쪼개면 내일 다시 읽게 된다. 어제(7/17) 예고대로 내일 세션은 브라우저 UI 없이 곧바로 정찰에서 시작. 별건 각주: 7/17 저녁 VPS 홈에 serenity(트레이딩 봇, systemd 상시가동)와 학습 프로젝트가 공존하는 걸 정리 — 실제론 안 섞여 있었고(폴더 격리됨), 홈 루트 파편 3개만 _archive로 mv(rm 아님, 복구 가능), WorkingDirectory=/root/serenity 확인 후 이동해 봇 무중단(active 유지). 그 정리는 학습 로드맵 밖이라 이 파일엔 각주로만."
     }
   ]
 }
