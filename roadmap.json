@@ -641,6 +641,19 @@
         "\"정찰과 코드는 같은 호흡\" 원칙 지켜 구조만 보고 내용은 안 엶"
       ],
       "summary": "수련회(7/17~19) 둘째날, 어제 확보한 clone 명령을 실제 실행해 codecrafters-redis-java 레포를 VPS(~/)에 안착시켰다. 오늘의 유일한 마찰은 clone 주소 찾기 — 브라우저 주소창(app.codecrafters.io/courses/redis/... = 보는 곳)을 계속 clone 주소로 착각했고, 실제 필요한 건 코스 화면 본문의 \"Clone the repository\" 복붙칸에 있는 git.codecrafters.io/1e6aca72db41e76f(받는 곳)였다. 이 \"보는 곳 vs 받는 곳\" 구분이 오늘 얻은 것. clone 성공(명령에 cd까지 붙어 폴더 안 자동 진입), ls로 codecrafters-redis-java 확인. 구조만 보고(ls -R, 내용은 안 엶) 두 가지 미리 파악: ① pom.xml 존재 = 빌드는 Maven(내일 mvn 없으면 sdk install maven 예고) ② Main.java 위치(src/main/java/) = 내일 정찰+주석 해제 대상. 오늘 정찰(README·Main.java 내용 읽기)을 일부러 안 한 이유: 이 코스는 \"읽으며 주석 해제\"라 정찰과 코드가 같은 호흡이어야 하고, 오늘 쪼개면 내일 다시 읽게 된다. 어제(7/17) 예고대로 내일 세션은 브라우저 UI 없이 곧바로 정찰에서 시작. 별건 각주: 7/17 저녁 VPS 홈에 serenity(트레이딩 봇, systemd 상시가동)와 학습 프로젝트가 공존하는 걸 정리 — 실제론 안 섞여 있었고(폴더 격리됨), 홈 루트 파편 3개만 _archive로 mv(rm 아님, 복구 가능), WorkingDirectory=/root/serenity 확인 후 이동해 봇 무중단(active 유지). 그 정리는 학습 로드맵 밖이라 이 파일엔 각주로만."
+    },
+    {
+      "date": "2026-07-20",
+      "title": "m106 완결 — 6379를 내 손으로 열다 (Stage 1 통과) + 환경 마찰 4연쇄 돌파",
+      "focus": [
+        "Spring이 대신 열어주던 포트를 처음 직접 오픈(new ServerSocket + accept()=blocking 대기의 정체)",
+        "남의 템플릿 버전 설정과 내 환경의 불일치를 어디서 고치는가(Maven 25→21",
+        "--enable-preview 제거)",
+        "★로컬 컴파일 통과 ≠ 원격 빌드 통과(preview 플래그가 로컬선 안 걸리고 CI에서 잡힘)",
+        "cd 스코프 실수 3번째 재발과 그 고정 절차화",
+        "update.py 자동화의 정체(매분 크론)"
+      ],
+      "summary": "m106(CodeCrafters Redis Stage 1)을 완결했다 — 7월 관문 사실상 완주(남은 건 m107 월말 점검뿐). 코드 자체는 스캐폴드 주석 해제(ServerSocket/accept)라 10분거리였지만, 오늘의 본체는 그 앞뒤에 줄줄이 걸린 환경 마찰 4연쇄였다: ① Maven 미설치→sdk install maven ② pom.xml이 자바 25 요구인데 VPS는 JDK21→invalid target release 25, sed로 25→21 ③ cd 스코프 실수 3번째 재발(세션 새로 열려 홈으로 돌아간 걸 모르고 mvn→MissingProjectException) ④ ★가장 중요—로컬(JDK21)에선 mvn compile 조용히 통과했는데 CodeCrafters 원격 빌드가 invalid source release 21 with --enable-preview로 실패. 원인: pom.xml에 25 전용 preview 플래그가 남아 있었고, 로컬 JDK21은 preview 안 써서 그냥 넘어갔지만 원격은 잡아냄=로컬 통과가 원격 통과를 보장하지 않는다는 걸 눈으로 봄. compilerArgs 블록 3줄 sed 삭제로 해결→push→Stage 1 \"Test passed. Congrats!\"(테스터가 6379로 접속, accept()가 받아냄=7/6 Q1 \"서버의 존재 이유는 기다림\"이 코드로 처음 돌아간 순간). 그 뒤 roadmap.json m106 todo→done(sed), 매분 크론이 자동 커밋·push. update.py의 정체도 이번에 확정—인자 안 받고 매분 크론으로 자동 동기화되는 봇이라 7/19 커밋 2개 미스터리와 \"nothing to commit\"이 다 설명됨. 부록: 7/17(계정+clone 명령 확보)·7/18(clone 실행+레포 안착) 백필 요약, 7/19(복구만—작업기록 없음)."
     }
   ]
 }
