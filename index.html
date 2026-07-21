@@ -881,6 +881,16 @@ const ROADMAP = {
         "update.py 자동화의 정체(매분 크론)"
       ],
       "summary": "m106(CodeCrafters Redis Stage 1)을 완결했다 — 7월 관문 사실상 완주(남은 건 m107 월말 점검뿐). 코드 자체는 스캐폴드 주석 해제(ServerSocket/accept)라 10분거리였지만, 오늘의 본체는 그 앞뒤에 줄줄이 걸린 환경 마찰 4연쇄였다: ① Maven 미설치→sdk install maven ② pom.xml이 자바 25 요구인데 VPS는 JDK21→invalid target release 25, sed로 25→21 ③ cd 스코프 실수 3번째 재발(세션 새로 열려 홈으로 돌아간 걸 모르고 mvn→MissingProjectException) ④ ★가장 중요—로컬(JDK21)에선 mvn compile 조용히 통과했는데 CodeCrafters 원격 빌드가 invalid source release 21 with --enable-preview로 실패. 원인: pom.xml에 25 전용 preview 플래그가 남아 있었고, 로컬 JDK21은 preview 안 써서 그냥 넘어갔지만 원격은 잡아냄=로컬 통과가 원격 통과를 보장하지 않는다는 걸 눈으로 봄. compilerArgs 블록 3줄 sed 삭제로 해결→push→Stage 1 \"Test passed. Congrats!\"(테스터가 6379로 접속, accept()가 받아냄=7/6 Q1 \"서버의 존재 이유는 기다림\"이 코드로 처음 돌아간 순간). 그 뒤 roadmap.json m106 todo→done(sed), 매분 크론이 자동 커밋·push. update.py의 정체도 이번에 확정—인자 안 받고 매분 크론으로 자동 동기화되는 봇이라 7/19 커밋 2개 미스터리와 \"nothing to commit\"이 다 설명됨. 부록: 7/17(계정+clone 명령 확보)·7/18(clone 실행+레포 안착) 백필 요약, 7/19(복구만—작업기록 없음)."
+    },
+    {
+      "date": "2026-07-21",
+      "title": "m102 done 정식 처리 — \"자바 기초 완결?\" 질문을 닫다 (표시 누락 정정)",
+      "focus": [
+        "로드맵의 미완 표시가 실제 미완이 아니라 done 체크 누락이었음을 논리로 판별(뒤 마일스톤이 done이면 그 앞은 이미 관통)",
+        "\"자바 기초\"를 별도 완결 목표로 세우지 않는 로드맵 철학(문법은 프로젝트에 딸려오는 재료)",
+        "시간 없는 날의 실질 있는 정리로 마감(빈 커밋 회피 원칙 3번째 적용)"
+      ],
+      "summary": "\"GitHub backend-journey에서 체크가 안 되어 있다\"는 관찰에서 출발 — 며칠 흐릿하던 \"자바 기초는 언제 완결나냐\"는 질문의 정체가 여기 있었다. roadmap.json을 실제로 열어보니 m106은 정상 done이었고, 진짜 범인은 m102(\"Java 기초: 변수·조건·클래스·메서드·리스트·맵·예외\")가 in_progress로 남아 있던 것. 순서대로 m101 done → m102 in_progress → m103~106 done이라, 자바 기초 칸 하나만 비어 로드맵이 미완처럼 보였다. 핵심 판별: 이건 실제 미완이 아니라 표시 누락이다 — m103~106(Spring 전환·예외·REST·소켓)이 전부 done인 것 자체가 m102의 기초(record·예외·Map·제네릭)를 이미 딛고 섰다는 증거. m106이 7/19에 겪은 것과 같은 상태 불일치. sed로 m102 in_progress→done, JSON OK, 크론이 11:03에 자동 커밋·push(login: Taewoo-Won, 2026-07-21T11:03:01Z로 GitHub 인정 확인). 결과: m101~106 끊김 없이 done, m107(월말)만 남음, 자바 기초 로드맵상 완료. 부수 교훈: \"자바 기초 완결\"을 새 목표로 세우는 건 로드맵의 프로젝트 중심 설계와 안 맞음—문법은 먼저 떼는 과목이 아니라 그때그때 프로젝트에서 집어 쓰는 재료. 앞으로 만날 자바(스트림·동시성)는 m102 기초가 아니라 각 프로젝트 심화. 시간 없는 날 억지 빈 커밋 대신 실질 정리로 마감(7/11·7/16과 같은 운영)."
     }
   ]
 };
