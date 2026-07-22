@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>복기지 — backend-journey</title>
+<style>
+  :root { --bg:#0f1115; --card:#181b22; --line:#2a2f3a; --tx:#e6e8ee; --sub:#9aa3b2;
+          --ok:#3fb96f; --mid:#e0b64a; --bad:#e06a5a; --acc:#5b8def; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--tx);
+         font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif; }
+  .wrap { max-width:760px; margin:0 auto; padding:16px 14px 60px; }
+  h1 { font-size:20px; margin:6px 0 2px; }
+  .sub { color:var(--sub); font-size:13px; margin-bottom:14px; }
+  .tabs { display:flex; gap:8px; margin:10px 0 14px; }
+  .tabs button { flex:1; padding:10px 0; border:1px solid var(--line); background:var(--card);
+                 color:var(--tx); border-radius:10px; font-size:15px; }
+  .tabs button.on { border-color:var(--acc); color:var(--acc); font-weight:700; }
+  .bar { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; align-items:center; }
+  select,input[type=number] { background:var(--card); color:var(--tx); border:1px solid var(--line);
+                              border-radius:8px; padding:7px 8px; font-size:14px; }
+  label.chk { font-size:13px; color:var(--sub); display:flex; align-items:center; gap:4px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:12px; }
+  .meta { font-size:12px; color:var(--sub); margin-bottom:8px; display:flex; justify-content:space-between; }
+  .q { font-size:16px; line-height:1.55; white-space:pre-wrap; }
+  textarea { width:100%; min-height:110px; margin-top:10px; background:#101319; color:var(--tx);
+             border:1px solid var(--line); border-radius:8px; padding:10px; font-size:14px; line-height:1.5; }
+  textarea.code { font-family:ui-monospace,Menlo,Consolas,monospace; min-height:260px; white-space:pre; }
+  .row { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .row button, .row a { flex:1; min-width:90px; text-align:center; padding:10px 0; border-radius:9px;
+        border:1px solid var(--line); background:#12151c; color:var(--tx); font-size:14px; text-decoration:none; }
+  .g button.sel-O { border-color:var(--ok); color:var(--ok); font-weight:700; }
+  .g button.sel-T { border-color:var(--mid); color:var(--mid); font-weight:700; }
+  .g button.sel-X { border-color:var(--bad); color:var(--bad); font-weight:700; }
+  .nav { display:flex; gap:8px; }
+  .nav button { flex:1; padding:11px 0; border-radius:9px; border:1px solid var(--line); background:#12151c; color:var(--tx); }
+  .nav .go { border-color:var(--acc); color:var(--acc); font-weight:700; }
+  pre.origin { background:#101319; border:1px solid var(--line); border-radius:8px; padding:10px;
+               overflow-x:auto; font-size:13px; line-height:1.45; }
+  table.diff { width:100%; border-collapse:collapse; font-family:ui-monospace,Menlo,Consolas,monospace;
+               font-size:12px; margin-top:10px; }
+  table.diff td { border-top:1px solid var(--line); padding:3px 6px; vertical-align:top; white-space:pre-wrap; word-break:break-all; }
+  td.no { color:var(--sub); width:30px; }
+  td.st { width:22px; }
+  tr.ok td.st { color:var(--ok); } tr.bad td.st { color:var(--bad); }
+  tr.bad { background:rgba(224,106,90,.07); }
+  .score { font-size:22px; font-weight:800; margin-top:10px; }
+  .score.hi { color:var(--ok); } .score.md { color:var(--mid); } .score.lo { color:var(--bad); }
+  .hint { font-size:12px; color:var(--sub); margin-top:6px; line-height:1.5; }
+  .timer { font-variant-numeric:tabular-nums; color:var(--sub); font-size:13px; }
+  .empty { color:var(--sub); text-align:center; padding:40px 0; }
+  #exportBox { display:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>복기지</h1>
+  <div class="sub" id="dataInfo">데이터 불러오는 중…</div>
+
+  <div class="tabs">
+    <button id="tabQ" class="on" onclick="setMode('q')">문제 복기</button>
+    <button id="tabC" onclick="setMode('c')">코드 재현</button>
+  </div>
+
+  <!-- ===== 문제 모드 ===== -->
+  <div id="modeQ">
+    <div class="bar">
+      <select id="daySel" onchange="buildPool()"></select>
+      <select id="orderSel" onchange="buildPool()">
+        <option value="seq">순서대로</option>
+        <option value="rand">랜덤</option>
+      </select>
+      <select id="cntSel" onchange="buildPool()">
+        <option value="0">전체</option><option value="5">5문항</option><option value="10">10문항</option>
+      </select>
+      <label class="chk"><input type="checkbox" id="starOnly" onchange="buildPool()">★만</label>
+    </div>
+    <div id="qArea"></div>
+    <div class="nav">
+      <button onclick="move(-1)">← 이전</button>
+      <button class="go" onclick="move(1)">다음 →</button>
+    </div>
+    <div class="row">
+      <button onclick="exportAnswers()">답안 내보내기 (복사)</button>
+    </div>
+    <textarea id="exportBox" readonly></textarea>
+    <div class="hint">사용법: 답을 직접 타이핑 → [출처 열기]로 그날 로그의 해당 섹션을 읽고 O/△/X 자가채점.
+    △·X 문항은 [답안 내보내기] → 네이버 내게쓰기 → 폰에서 클로드 채팅에 붙이면 채점·꼬리질문을 받는다.</div>
+  </div>
+
+  <!-- ===== 코드 재현 모드 ===== -->
+  <div id="modeC" style="display:none">
+    <div class="bar">
+      <select id="codeSel" onchange="pickCode()"></select>
+      <label class="chk"><input type="checkbox" id="blind" checked onchange="pickCode()">독타이핑(원본 숨김)</label>
+      <span class="timer" id="timer">00:00</span>
+    </div>
+    <pre class="origin" id="originPre" style="display:none"></pre>
+    <textarea class="code" id="codeInput" spellcheck="false"
+      placeholder="여기에 기억으로 코드를 타이핑한다. 첫 키 입력에 타이머 시작."></textarea>
+    <div class="row">
+      <button onclick="compareCode()">비교 · 채점</button>
+      <button onclick="resetCode()">다시</button>
+    </div>
+    <div id="diffOut"></div>
+    <div class="hint">독타이핑 = 빈 화면에 기억으로(7/9 재현훈련의 상설판). 체크 해제하면 보고치기(원본 보며 타이핑).
+    비교는 줄 단위 — 들여쓰기·철자까지 정확히. 끝 공백만 무시한다.</div>
+  </div>
+</div>
+
+<script>
+let DATA=null, pool=[], idx=0, ans={}, curCode=null, t0=null, tInt=null, lastCodeResult=null;
+
+fetch('review-data.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
+  DATA=d; init();
+}).catch(()=>{ document.getElementById('dataInfo').textContent='review-data.json 로드 실패 — 크론이 아직 안 돌았거나 경로 문제'; });
+
+function init(){
+  const days=DATA.days;
+  const nq=days.reduce((s,x)=>s+x.questions.length,0);
+  const nc=days.reduce((s,x)=>s+x.codes.length,0);
+  document.getElementById('dataInfo').textContent=
+    `최신 ${DATA.latest} · ${days.length}일치 · 문제 ${nq} · 코드 ${nc} (로그 올리면 1분 내 자동 갱신)`;
+  const ds=document.getElementById('daySel');
+  ds.innerHTML='';
+  ds.append(new Option('최신 하루 ('+DATA.latest+')','latest'));
+  ds.append(new Option('전체 누적','all'));
+  [...days].reverse().forEach(x=>ds.append(new Option(x.date,x.date)));
+  const cs=document.getElementById('codeSel');
+  cs.innerHTML='';
+  days.forEach(x=>x.codes.forEach((c,i)=>{
+    cs.append(new Option(`${x.date} · ${c.title}`.slice(0,60), x.date+'|'+i));
+  }));
+  buildPool(); pickCode();
+}
+
+function setMode(m){
+  document.getElementById('modeQ').style.display = m==='q'?'':'none';
+  document.getElementById('modeC').style.display = m==='c'?'':'none';
+  document.getElementById('tabQ').classList.toggle('on',m==='q');
+  document.getElementById('tabC').classList.toggle('on',m==='c');
+}
+
+/* ---------- 문제 모드 ---------- */
+function buildPool(){
+  const sel=document.getElementById('daySel').value||'latest';
+  const star=document.getElementById('starOnly').checked;
+  const order=document.getElementById('orderSel').value;
+  const cnt=+document.getElementById('cntSel').value;
+  let days=DATA.days;
+  if(sel==='latest') days=days.filter(x=>x.date===DATA.latest);
+  else if(sel!=='all') days=days.filter(x=>x.date===sel);
+  pool=[];
+  days.forEach(x=>x.questions.forEach(q=>{
+    if(star&&!q.star) return;
+    pool.push({date:x.date,n:q.n,q:q.q,star:q.star});
+  }));
+  if(order==='rand') for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  if(cnt>0) pool=pool.slice(0,cnt);
+  idx=0; renderQ();
+}
+
+function key(it){ return it.date+'#'+it.n; }
+
+function renderQ(){
+  const area=document.getElementById('qArea');
+  area.innerHTML='';
+  if(!pool.length){ area.innerHTML='<div class="empty">이 범위엔 문항이 없다</div>'; return; }
+  const it=pool[idx], k=key(it), st=ans[k]||{a:'',g:''};
+  const card=document.createElement('div'); card.className='card';
+  const meta=document.createElement('div'); meta.className='meta';
+  meta.innerHTML=`<span>${it.date} · #${it.n}${it.star?' ★':''}</span><span>${idx+1} / ${pool.length}</span>`;
+  const q=document.createElement('div'); q.className='q';
+  q.textContent=it.q.replace(/\*\*/g,'');
+  const ta=document.createElement('textarea');
+  ta.placeholder='답을 타이핑한다 — 쓰는 것 자체가 인출 훈련이다';
+  ta.value=st.a;
+  ta.oninput=()=>{ (ans[k]=ans[k]||{a:'',g:''}).a=ta.value; };
+  const g=document.createElement('div'); g.className='row g';
+  [['O','맞음'],['T','애매 △'],['X','틀림']].forEach(([v,label])=>{
+    const b=document.createElement('button');
+    b.textContent=label;
+    if(st.g===v) b.classList.add('sel-'+v);
+    b.onclick=()=>{ (ans[k]=ans[k]||{a:'',g:''}).g=v; renderQ(); };
+    g.appendChild(b);
+  });
+  const src=document.createElement('div'); src.className='row';
+  const a=document.createElement('a');
+  a.href=`https://github.com/Taewoo-Won/backend-journey/blob/main/logs/${it.date}.md`;
+  a.target='_blank'; a.textContent='출처 열기 (그날 로그)';
+  src.appendChild(a);
+  card.append(meta,q,ta,g,src);
+  area.appendChild(card);
+}
+
+function move(d){ if(!pool.length)return; idx=Math.min(pool.length-1,Math.max(0,idx+d)); renderQ(); }
+
+function exportAnswers(){
+  const lines=['[복기지 답안] '+new Date().toISOString().slice(0,10)];
+  let n=0;
+  pool.forEach(it=>{
+    const st=ans[key(it)];
+    if(!st||(!st.a&&!st.g)) return;
+    n++;
+    const gtxt={O:'O',T:'△',X:'X'}[st.g]||'-';
+    lines.push('--',`Q(${it.date} #${it.n}${it.star?' ★':''}): ${it.q.replace(/\*\*/g,'')}`,`답: ${st.a||'(빈칸)'}`,`자평: ${gtxt}`);
+  });
+  if(lastCodeResult) lines.push('--','[코드 재현] '+lastCodeResult);
+  if(n===0&&!lastCodeResult){ alert('내보낼 답안이 없다'); return; }
+  const txt=lines.join('\n');
+  const box=document.getElementById('exportBox');
+  box.style.display='block'; box.value=txt; box.select();
+  if(navigator.clipboard) navigator.clipboard.writeText(txt).then(()=>alert('복사됨 — 네이버 내게쓰기에 붙여라')).catch(()=>alert('아래 박스에서 수동 복사'));
+  else { document.execCommand('copy'); alert('복사 시도됨 — 안 되면 아래 박스에서 수동 복사'); }
+}
+
+/* ---------- 코드 재현 모드 ---------- */
+function pickCode(){
+  const v=document.getElementById('codeSel').value;
+  if(!v){ curCode=null; return; }
+  const [date,i]=v.split('|');
+  const day=DATA.days.find(x=>x.date===date);
+  curCode=day?day.codes[+i]:null;
+  const pre=document.getElementById('originPre');
+  const blind=document.getElementById('blind').checked;
+  if(curCode&&!blind){ pre.style.display='block'; pre.textContent=curCode.code; }
+  else pre.style.display='none';
+  document.getElementById('diffOut').innerHTML='';
+}
+
+document.getElementById('codeInput').addEventListener('input',()=>{
+  if(t0===null){ t0=Date.now();
+    tInt=setInterval(()=>{ const s=Math.floor((Date.now()-t0)/1000);
+      document.getElementById('timer').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+    },500);
+  }
+});
+
+function resetCode(){
+  document.getElementById('codeInput').value='';
+  document.getElementById('diffOut').innerHTML='';
+  t0=null; clearInterval(tInt); document.getElementById('timer').textContent='00:00';
+}
+
+function compareCode(){
+  if(!curCode){ alert('코드를 선택해라'); return; }
+  clearInterval(tInt);
+  const exp=curCode.code.split('\n').map(s=>s.replace(/\s+$/,''));
+  const got=document.getElementById('codeInput').value.split('\n').map(s=>s.replace(/\s+$/,''));
+  const n=Math.max(exp.length,got.length);
+  let eq=0;
+  const tbl=document.createElement('table'); tbl.className='diff';
+  for(let i=0;i<n;i++){
+    const e=exp[i]??'', g=got[i]??'', same=(e===g);
+    if(same) eq++;
+    const tr=document.createElement('tr'); tr.className=same?'ok':'bad';
+    const td1=document.createElement('td'); td1.className='no'; td1.textContent=i+1;
+    const td2=document.createElement('td'); td2.className='st'; td2.textContent=same?'✓':'✗';
+    const td3=document.createElement('td');
+    td3.textContent = same ? e : (g||'(빈 줄)')+'\n→ '+(e||'(원본엔 없음)');
+    tr.append(td1,td2,td3); tbl.appendChild(tr);
+  }
+  const pct=Math.round(eq/n*100);
+  const out=document.getElementById('diffOut'); out.innerHTML='';
+  const sc=document.createElement('div');
+  sc.className='score '+(pct>=90?'hi':pct>=60?'md':'lo');
+  sc.textContent=`일치율 ${pct}% (${eq}/${n}줄) · ${document.getElementById('timer').textContent}`;
+  out.append(sc,tbl);
+  lastCodeResult=`${curCode.title} — 일치율 ${pct}% (${eq}/${n}줄), ${document.getElementById('timer').textContent}, ${document.getElementById('blind').checked?'독타이핑':'보고치기'}`;
+}
+</script>
+</body>
+</html>
