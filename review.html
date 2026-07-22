@@ -43,8 +43,10 @@
   table.diff td { border-top:1px solid var(--line); padding:3px 6px; vertical-align:top; white-space:pre-wrap; word-break:break-all; }
   td.no { color:var(--sub); width:30px; }
   td.st { width:22px; }
-  tr.ok td.st { color:var(--ok); } tr.bad td.st { color:var(--bad); }
-  tr.bad { background:rgba(224,106,90,.07); }
+  tr.ok td.st { color:var(--ok); }
+  tr.miss td.st { color:var(--bad); } tr.miss { background:rgba(224,106,90,.09); }
+  tr.extra td.st { color:var(--mid); } tr.extra { background:rgba(224,182,74,.09); }
+  .tag { font-size:11px; opacity:.75; }
   .score { font-size:22px; font-weight:800; margin-top:10px; }
   .score.hi { color:var(--ok); } .score.md { color:var(--mid); } .score.lo { color:var(--bad); }
   .hint { font-size:12px; color:var(--sub); margin-top:6px; line-height:1.5; }
@@ -243,31 +245,57 @@ function resetCode(){
   t0=null; clearInterval(tInt); document.getElementById('timer').textContent='00:00';
 }
 
+/* LCS 정렬 비교 — git diff와 같은 방식.
+   한 줄을 빠뜨리거나 더 넣어도 그 줄만 잡히고, 나머지는 제자리에서 대조된다. */
+function lcsDiff(a,b){
+  const n=a.length,m=b.length;
+  const dp=Array.from({length:n+1},()=>new Uint16Array(m+1));
+  for(let i=n-1;i>=0;i--)
+    for(let j=m-1;j>=0;j--)
+      dp[i][j] = a[i]===b[j] ? dp[i+1][j+1]+1 : Math.max(dp[i+1][j],dp[i][j+1]);
+  const out=[]; let i=0,j=0;
+  while(i<n&&j<m){
+    if(a[i]===b[j]){ out.push({t:'ok',line:a[i],ei:i}); i++; j++; }
+    else if(dp[i+1][j]>=dp[i][j+1]){ out.push({t:'miss',line:a[i],ei:i}); i++; }
+    else { out.push({t:'extra',line:b[j],ei:-1}); j++; }
+  }
+  while(i<n){ out.push({t:'miss',line:a[i],ei:i}); i++; }
+  while(j<m){ out.push({t:'extra',line:b[j],ei:-1}); j++; }
+  return out;
+}
+
 function compareCode(){
   if(!curCode){ alert('코드를 선택해라'); return; }
   clearInterval(tInt);
   const exp=curCode.code.split('\n').map(s=>s.replace(/\s+$/,''));
   const got=document.getElementById('codeInput').value.split('\n').map(s=>s.replace(/\s+$/,''));
-  const n=Math.max(exp.length,got.length);
-  let eq=0;
+  const rows=lcsDiff(exp,got);
+  let ok=0,miss=0,extra=0;
   const tbl=document.createElement('table'); tbl.className='diff';
-  for(let i=0;i<n;i++){
-    const e=exp[i]??'', g=got[i]??'', same=(e===g);
-    if(same) eq++;
-    const tr=document.createElement('tr'); tr.className=same?'ok':'bad';
-    const td1=document.createElement('td'); td1.className='no'; td1.textContent=i+1;
-    const td2=document.createElement('td'); td2.className='st'; td2.textContent=same?'✓':'✗';
+  rows.forEach(r=>{
+    if(r.t==='ok') ok++; else if(r.t==='miss') miss++; else extra++;
+    const tr=document.createElement('tr'); tr.className=r.t;
+    const td1=document.createElement('td'); td1.className='no';
+    td1.textContent = r.ei>=0 ? (r.ei+1) : '·';
+    const td2=document.createElement('td'); td2.className='st';
+    td2.textContent = r.t==='ok' ? '✓' : r.t==='miss' ? '−' : '+';
     const td3=document.createElement('td');
-    td3.textContent = same ? e : (g||'(빈 줄)')+'\n→ '+(e||'(원본엔 없음)');
+    if(r.t==='ok') td3.textContent=r.line;
+    else {
+      const tag=document.createElement('span'); tag.className='tag';
+      tag.textContent = r.t==='miss' ? '[빠뜨림] ' : '[군더더기] ';
+      td3.append(tag, document.createTextNode(r.line||'(빈 줄)'));
+    }
     tr.append(td1,td2,td3); tbl.appendChild(tr);
-  }
-  const pct=Math.round(eq/n*100);
+  });
+  const pct = exp.length ? Math.round(ok/exp.length*100) : 0;
   const out=document.getElementById('diffOut'); out.innerHTML='';
   const sc=document.createElement('div');
   sc.className='score '+(pct>=90?'hi':pct>=60?'md':'lo');
-  sc.textContent=`일치율 ${pct}% (${eq}/${n}줄) · ${document.getElementById('timer').textContent}`;
+  const time=document.getElementById('timer').textContent;
+  sc.textContent=`재현율 ${pct}% · 맞음 ${ok}/${exp.length}줄 · 빠뜨림 ${miss} · 군더더기 ${extra} · ${time}`;
   out.append(sc,tbl);
-  lastCodeResult=`${curCode.title} — 일치율 ${pct}% (${eq}/${n}줄), ${document.getElementById('timer').textContent}, ${document.getElementById('blind').checked?'독타이핑':'보고치기'}`;
+  lastCodeResult=`${curCode.title} — 재현율 ${pct}% (맞음 ${ok}/${exp.length}, 빠뜨림 ${miss}, 군더더기 ${extra}), ${time}, ${document.getElementById('blind').checked?'독타이핑':'보고치기'}`;
 }
 </script>
 </body>
